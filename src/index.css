@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+@config "../tailwind.config.ts";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    * {
+        border-color: inherit;
+        font-family: 'Roboto', sans-serif;
+        --contexify-menu-bgColor: #fff;
+        --contexify-separator-color: rgba(0, 0, 0, 0.2);
+        --contexify-item-color: #333;
+        --contexify-activeItem-color: #fff;
+        --contexify-activeItem-bgColor: #3498db;
+        --contexify-rightSlot-color: #6f6e77;
+        --contexify-activeRightSlot-color: #fff;
+        --contexify-arrow-color: #6f6e77;
+        --contexify-activeArrow-color: #fff;
+    }
+}
+
+@layer utilities {
+    .center {
+        @apply flex justify-center items-center;
+    }
+}
