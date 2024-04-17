@@ -66,7 +66,6 @@ function Create({}: Props) {
                                 username: username.current,
                             })
                             .select()
-                            //TODO: Error
                             .then((e) => updateProfile(e.data![0]))
                     }}
                 >
