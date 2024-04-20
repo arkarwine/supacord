@@ -13,14 +13,12 @@ export const useSearchProfiles = (search: string) => {
         queryFn: async ({ queryKey }: options) => {
             const [, query] = queryKey
             if (query === '') return []
-            return (
-                (
-                    await supabase
-                        .from('profiles')
-                        .select()
-                        .ilike('username', query.replace(' ', '') + '%')
-                ).data || []
-            )
+            const { data, error } = await supabase
+                .from('profiles')
+                .select()
+                .ilike('username', query.replace(' ', '') + '%')
+            if (error) throw error
+            return data || []
         },
         gcTime: 60000,
     })

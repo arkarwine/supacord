@@ -20,7 +20,7 @@ function Login() {
             <div className="flex h-full w-full justify-center items-center rounded-lg shadow-[0_0_6px_-1px_rgb(0_0_0/0.1)] sm:h-3/5 sm:w-3/5 md:h-5/6 md:w-2/5 lg:w-[35%] xl:w-[30%]">
                 <button
                     onClick={signIn}
-                    className="flex flex-row justify-center items-center rounded-full border-[1px] border-[#747775] bg-white px-3 py-2.5 text-[#1F1F1F] hover:bg-[#F2F2F2]"
+                    className="flex flex-row justify-center items-center rounded-full border-[1px] border-[#747775] bg-primary px-3 py-2.5 text-black hover:bg-hover-primary "
                 >
                     <div className="flex justify-center items-center pr-2.5">
                         {/* Google G Icon */}

@@ -4,8 +4,66 @@ import plugin from 'tailwindcss/plugin'
 
 export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+    darkMode: 'selector',
     theme: {
         extend: {
+            colors: {
+                // ----------
+                // Light Theme
+
+                primary: '#ffffff',
+                'secondary-from': '#bfdbfe',
+                'secondary-via': '#bae6fd',
+                'secondary-to': '#a5f3fc',
+
+                message: '#ffffff',
+                'reply-message': '#dbeafe',
+
+                'button-secondary': '#38bdf8',
+                toast: '#3b82f6',
+
+                'search-primary': '#e2e8f0',
+
+                header: '#eff6ff',
+
+                'context-menu': '#ffffff',
+
+                muted: '#64748b',
+                title: '#334155',
+                'secondary-title': '#0f172a',
+
+                // ----------
+                // Dark Theme
+
+                'dark-primary': '#374151',
+                'dark-secondary-from': '#1f2937',
+                'dark-secondary-via': '#0f172a',
+                'dark-secondary-to': '#27272a',
+
+                'dark-message': '#374151',
+                'dark-reply-message': '#4b5563',
+
+                'dark-button-secondary': '#2563eb',
+
+                'dark-toast': '#2563eb',
+
+                'dark-search-primary': '#1e293b',
+
+                'dark-header': '#374151',
+
+                'dark-context-menu': '#374151',
+
+                'dark-muted': '#cbd5e1',
+                'dark-title': '#ffffff',
+                'dark-secondary-title': '#f1f5f9',
+
+                // ------------
+                // Misselaneous
+
+                'hover-primary': '#80808020',
+                'hover-secondary': '#ffffff20',
+                'focus-txt': '#3b82f6',
+            },
             screens: {
                 '-md': { max: '768px' },
             },

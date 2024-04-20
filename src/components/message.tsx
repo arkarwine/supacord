@@ -32,27 +32,27 @@ const ChatMessage = forwardRef(
         return (
             <div
                 ref={ref}
-                className={` relative pl-2 transition-all ${isActive ? 'bg-[#80808020]' : ''} group h-min flex ${isSender ? 'justify-end' : 'justify-start'} py-1`}
+                className={` relative pl-2 transition-all ${isActive ? 'bg-hover-primary' : ''} group h-min flex ${isSender ? 'justify-end' : 'justify-start'} py-1`}
                 id={id}
                 onClick={onClick}
                 onContextMenu={onContextMenu}
                 onDoubleClick={onDoubleClick}
             >
                 <section
-                    className={`relative max-w-[40vw] min-w-16 pt-2 pb-4 px-2 rounded-t-xl ${isSender ? 'rounded-br-sm rounded-bl-xl text-end' : 'rounded-br-xl rounded-bl-sm text-start'} bg-blue-50`}
+                    className={`relative max-w-[40vw] min-w-16 pt-2 pb-4 px-2 rounded-t-xl ${isSender ? 'rounded-br-sm rounded-bl-xl ' : 'rounded-br-xl rounded-bl-sm'} bg-message dark:bg-dark-message`}
                 >
                     {replyText && (
                         <button
                             onClick={replyTextOnClick}
-                            className={`w-full overflow-hidden h-10 bg-blue-100 px-2 rounded-lg ${isSender ? 'text-end' : 'text-start'}`}
+                            className={`w-full overflow-hidden h-10 bg-reply-message dark:bg-dark-reply-message px-2 rounded-lg ${isSender ? 'text-end' : 'text-start'}`}
                         >
-                            <p className="text-slate-600 truncate">{replyText}</p>
+                            <p className="text-muted truncate dark:text-dark-muted">{replyText}</p>
                         </button>
                     )}
-                    <p className="select-text break-words mx-2">{text}</p>
+                    <p className="select-text break-words mx-2 whitespace-break-spaces">{text}</p>
                     {createdAt ? (
                         <p
-                            className={`${isSender ? 'left-1.5' : 'right-1.5'} bottom-0.5 absolute text-[10px] text-slate-400`}
+                            className={`${isSender ? 'left-1.5' : 'right-1.5'} bottom-0.5 absolute text-[10px] text-muted dark:text-dark-muted`}
                         >
                             {new Date(createdAt).toLocaleString('en-US', {
                                 hour: 'numeric',
@@ -67,7 +67,7 @@ const ChatMessage = forwardRef(
                             viewBox="0 0 24 24"
                             strokeWidth={1}
                             stroke="currentColor"
-                            className="w-3 h-3 absolute left-1 bottom-1 stroke-slate-400"
+                            className="w-3 h-3 absolute left-1 bottom-1 stroke-muted dark:stroke-dark-muted"
                         >
                             <path
                                 strokeLinecap="round"

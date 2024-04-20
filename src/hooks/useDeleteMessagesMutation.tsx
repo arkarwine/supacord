@@ -9,7 +9,13 @@ export const useDeleteMessagesMutation = () => {
             queryClient.setQueryData<Message[]>(['messages', chat_id], (oldMessages) =>
                 oldMessages?.filter((message) => message.id !== message_id),
             )
-            return await supabase.rpc('delete_message', { message_id: message_id, chat_id: chat_id })
+            const { data, error } = await supabase.rpc('delete_message', { message_id: message_id, chat_id: chat_id })
+            console.log(data)
+            if (error) throw error
+            return data
+        },
+        onError: (_, { chat_id }) => {
+            return queryClient.invalidateQueries({ queryKey: ['messages', chat_id] })
         },
     })
 }

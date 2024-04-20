@@ -8,8 +8,12 @@ export const useCheckUsername = (username: string) => {
         queryKey: ['usernames', username] as const,
         queryFn: async ({ queryKey }) => {
             const [, query] = queryKey
-            if (query === profile!.username || query === '') return true
-            else return (await supabase.from('profiles').select('*').eq('username', query)).data?.length === 0
+            if (query === profile?.username || query === '') return true
+            else {
+                const { data, error } = await supabase.from('profiles').select('*').eq('username', query)
+                if (error) throw error
+                return data.length === 0
+            }
         },
     })
 }

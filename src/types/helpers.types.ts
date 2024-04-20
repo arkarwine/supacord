@@ -1,9 +1,12 @@
 import { Database } from './database.types'
 
-type PublicTable = Database['public']['Tables']
+type PublicTables = Database['public']['Tables']
+type PublicViews = Database['public']['Views']
 
-export type Profile = PublicTable['profiles']['Row']
+export type Profile = PublicTables['profiles']['Row']
 
-export type Message = PublicTable['messages']['Row']
+export type Message = PublicTables['messages']['Row']
 
-export type InsertMessage = PublicTable['messages']['Insert']
+export type InsertMessage = PublicTables['messages']['Insert']
+
+export type ChatView = PublicViews['get_chats']['Row']

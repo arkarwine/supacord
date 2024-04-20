@@ -9,7 +9,10 @@ type Props = {
 function Search({ onChange, className = '', isLoading = false }: Props) {
     return (
         <form
-            className={'relative flex justify-center items-center rounded-lg bg-slate-200 ' + className}
+            className={
+                'relative flex justify-center items-center rounded-lg bg-search-primary dark:bg-dark-search-primary/30 ' +
+                className
+            }
             onSubmit={(e) => e.preventDefault()}
         >
             <input
@@ -45,7 +48,7 @@ function Search({ onChange, className = '', isLoading = false }: Props) {
                     viewBox="0 0 24 24"
                     strokeWidth="2.5"
                     stroke="currentColor"
-                    className="h-[1rem] basis-[48px] fill-none stroke-slate-400 transition-all peer-focus:stroke-blue-500"
+                    className="h-[1rem] basis-[48px] fill-none stroke-muted dark:stroke-dark-muted transition-all peer-focus:stroke-blue-500"
                 >
                     <path
                         strokeLinecap="round"

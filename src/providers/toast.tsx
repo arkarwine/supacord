@@ -1,7 +1,7 @@
 import React, { createContext, useRef, useState } from 'react'
 
 export interface Toast {
-    type: 'success' | 'fail' | 'info'
+    type: 'success' | 'error' | 'info'
     text: string
 }
 
@@ -52,7 +52,7 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                 return (
                     <div
                         key={toast.id}
-                        className={` flex absolute animate-[slide-in_0.2s_ease-out] py-6 pr-24 bg-blue-300 rounded-lg bottom-4 right-4 z-50 shadow-md ${toast.exit ? 'animate-[fade-out_0.3s_ease-out_forwards]' : ''}`}
+                        className={` flex absolute animate-[slide-in_0.2s_ease-out] py-6 pr-24 bg-toast dark:bg-dark-toast rounded-lg bottom-4 right-4 z-50 shadow-md ${toast.exit ? 'animate-[fade-out_0.3s_ease-out_forwards]' : ''}`}
                     >
                         <div className="w-6 center ml-3 mr-1">
                             {toast.type === 'success' ? (
@@ -62,7 +62,7 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 stroke-green-600"
+                                    className="w-6 h-6 stroke-green-400"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -70,7 +70,7 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                                         d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                     />
                                 </svg>
-                            ) : toast.type === 'fail' ? (
+                            ) : toast.type === 'error' ? (
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -92,7 +92,7 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 stroke-slate-600"
+                                    className="w-6 h-6 stroke-muted dark:stroke-dark-muted"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -104,21 +104,9 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                         </div>
                         <button
                             onClick={() => {
-                                setToasts((_toasts) =>
-                                    _toasts.map((_toast) =>
-                                        _toast.id === toast.id
-                                            ? {
-                                                  ..._toast,
-                                                  exit: true,
-                                              }
-                                            : _toast,
-                                    ),
-                                )
-                                setTimeout(() => {
-                                    setToasts((_toasts) => _toasts.filter((_toast) => _toast.id !== toast.id))
-                                }, 300)
+                                setToasts((_toasts) => _toasts.filter((_toast) => _toast.id !== toast.id))
                             }}
-                            className=" absolute right-1 top-1 w-8 h-8 center rounded-full hover:bg-[#80808020]"
+                            className=" absolute right-1 top-1 w-8 h-8 center rounded-full hover:bg-hover-primary"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -126,7 +114,7 @@ function ToastProvider({ children }: React.PropsWithChildren) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-4 h-4 stroke-slate-600"
+                                className="w-4 h-4 stroke-dark-muted"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>

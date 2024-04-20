@@ -7,6 +7,8 @@ export const useMessages = (chat_id: string) =>
         queryFn: async ({ queryKey }) => {
             const [, chat_id] = queryKey
             if (chat_id === '') return []
-            return (await supabase.rpc('get_messages', { chat_id: chat_id })).data
+            const { data, error } = await supabase.rpc('get_messages', { chat_id: chat_id })
+            if (error) throw error
+            return data
         },
     })

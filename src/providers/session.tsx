@@ -1,4 +1,4 @@
-import { PostgrestSingleResponse, Session } from '@supabase/supabase-js'
+import { Session } from '@supabase/supabase-js'
 import { UseMutateFunction, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { createContext, useEffect, useState } from 'react'
 import supabase from '../lib/supabase'
@@ -7,10 +7,10 @@ import { Profile } from '../types/helpers.types'
 export interface SessionState {
     session?: Session | null
     profile?: Profile | null
-    updateProfile: UseMutateFunction<PostgrestSingleResponse<UpdateProfile>, Error, UpdateProfile, unknown>
+    updateProfile: UseMutateFunction<UpdateProfile[], Error, UpdateProfile, unknown>
 }
 
-export type UpdateProfile = Pick<Profile, 'first_name' | 'last_name' | 'username'>
+export type UpdateProfile = Partial<Profile>
 
 export const SessionContext = createContext<SessionState>({} as SessionState)
 
@@ -23,23 +23,25 @@ export default function SessionProvider({ children }: React.PropsWithChildren) {
         queryFn: async ({ queryKey }) => {
             const [, user_id] = queryKey
             if (!user_id) return null
-            return (await supabase.from('profiles').select('*').eq('id', user_id)).data?.at(0) || null
+            const { data, error } = await supabase.from('profiles').select('*').eq('id', user_id)
+            if (error) throw error
+            return data.at(-1) || null
         },
     })
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation({
-        mutationFn: async ({ first_name, username, last_name }: UpdateProfile) =>
-            await supabase
+        mutationFn: async (updated_profile: UpdateProfile) => {
+            const { data, error } = await supabase
                 .from('profiles')
                 .update({
-                    username: username,
-                    first_name: first_name,
-                    last_name: last_name,
+                    ...updated_profile,
                 })
                 .eq('id', session!.user.id)
                 .select()
-                .single(),
+            if (error) throw error
+            return data
+        },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
     })
 

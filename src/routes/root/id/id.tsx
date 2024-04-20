@@ -22,7 +22,7 @@ type Props = {
     chat: Chat
 }
 
-export type BaseMessage = Pick<Message, 'text' | 'sender_id' | 'reply_to_message_id'> & Partial<Message>
+export type ChatMessage = Pick<Message, 'text' | 'sender_id' | 'reply_to_message_id'> & Partial<Message>
 
 function Id({ chat }: Props) {
     const { session, profile, updateProfile } = useSession()
@@ -36,12 +36,14 @@ function Id({ chat }: Props) {
         const [lastName, setLastName] = useState(profile!.last_name || '')
         const [username, setUsername] = useState(profile!.username || '')
         const [edit, setEdit] = useState<'firstName' | 'lastName' | 'username' | null>(null)
+        const [uploading, setUploading] = useState(false)
 
-        const { data: usernameIsValid, isFetching } = useCheckUsername(username)
+        const { data: usernameIsAvailable, isFetching } = useCheckUsername(username)
+        const usernameIsValid = !/[^a-zA-Z1-9_]/g.test(username)
 
         return (
-            <div className="h-full md:p-4 flex flex-col items-center gap-y-2">
-                <section className="max-w-[768px] h-min w-full md:bg-white/50 rounded-lg flex">
+            <div className="h-full md:p-4 flex flex-col items-center gap-y-2 ">
+                <section className="max-w-[768px] h-min w-full md:bg-primary/50 dark:md:bg-dark-primary/50 rounded-lg flex">
                     <div className="p-1 w-14">
                         <BackButton onClick={() => navigate('/chat')} />
                     </div>
@@ -49,35 +51,93 @@ function Id({ chat }: Props) {
                         <div className="group relative basis-24 grow-0 shrink-0 peer rounded-full h-24 center overflow-hidden">
                             <Avatar
                                 fullname={(profile!.first_name || '') + (profile!.last_name || '')}
-                                src=""
+                                id={profile!.avatar || null}
                                 fallback={profile!.first_name.slice(0, 2)}
                                 className="scale-[2] aspect-square"
                             />
-                            <button className="rounded-full transition-all opacity-0 absolute group-hover:opacity-100 bg-[#ffffff20] inset-0 center">
-                                <svg
-                                    type="button"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1}
-                                    stroke="currentColor"
-                                    className="w-7 h-7 stroke-white"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                                    />
-                                </svg>
+                            <input
+                                onChange={(e) => {
+                                    const files = e.currentTarget.files
+                                    if (files) {
+                                        const url = `https://api.cloudinary.com/v1_1/doiynq1dh/upload`
+                                        const formData = new FormData()
+                                        const blob = files[0].slice(0, files[0].size, files[0].type)
+                                        const file = new File([blob], session!.user.id, { type: files[0].type })
+                                        formData.append('file', file)
+                                        formData.append('upload_preset', 'avatar_sm')
+
+                                        fetch(url, {
+                                            method: 'POST',
+                                            body: formData,
+                                        })
+                                            .then((res) => res.json())
+                                            .then((res) => {
+                                                updateProfile(
+                                                    {
+                                                        avatar: res.public_id as string,
+                                                    },
+                                                    {
+                                                        onSettled: () => setUploading(false),
+                                                    },
+                                                )
+                                            })
+                                    }
+                                }}
+                                type="file"
+                                id="fileInput"
+                                className="hidden"
+                                accept="image/*"
+                            />
+                            <button
+                                disabled={uploading}
+                                onClick={() => {
+                                    const fileInput = document.getElementById('fileInput')!
+                                    fileInput.click()
+                                }}
+                                className="rounded-full transition-all opacity-0 absolute group-hover:opacity-100 bg-hover-secondary inset-0 center"
+                            >
+                                {uploading ? (
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="transition-all w-7 h-7 stroke-white"
+                                    >
+                                        <style
+                                            dangerouslySetInnerHTML={{
+                                                __html: '.spinner_V8m1{transform-origin:center;animation:spinner_zKoa 2s linear infinite}.spinner_V8m1 circle{stroke-linecap:round;animation:spinner_YpZS 1.5s ease-in-out infinite}@keyframes spinner_zKoa{100%{transform:rotate(360deg)}}@keyframes spinner_YpZS{0%{stroke-dasharray:0 150;stroke-dashoffset:0}47.5%{stroke-dasharray:42 150;stroke-dashoffset:-16}95%,100%{stroke-dasharray:42 150;stroke-dashoffset:-59}}',
+                                            }}
+                                        />
+                                        <g className="spinner_V8m1">
+                                            <circle cx={12} cy={12} r="9.5" fill="none" strokeWidth={2} />
+                                        </g>
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        type="button"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1}
+                                        stroke="currentColor"
+                                        className="transition-all w-7 h-7 stroke-white"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                                        />
+                                    </svg>
+                                )}
                             </button>
                         </div>
 
                         <section className=" pt-14 h-full basis-full flex flex-col justify-center gap-y-2 pl-4">
                             <div className="flex items-center group">
                                 <div>
-                                    <p className="text-xs leading-[8px] text-slate-600">First Name</p>
+                                    <p className="text-xs leading-[8px] text-muted dark:text-dark-muted">First Name</p>
 
                                     <input
+                                        maxLength={32}
                                         ref={firstNameRef}
                                         onChange={(e) => setFirstName(e.target.value)}
                                         readOnly={edit !== 'firstName'}
@@ -92,7 +152,7 @@ function Id({ chat }: Props) {
                                         setEdit(edit === 'firstName' ? null : 'firstName')
                                         firstNameRef.current?.focus()
                                     }}
-                                    className="transition-all w-8 h-8 center hover:bg-[#80808020] rounded-full active:scale-95"
+                                    className="transition-all w-8 h-8 center hover:bg-hover-primary rounded-full active:scale-95"
                                 >
                                     {edit !== 'firstName' ? (
                                         <svg
@@ -101,7 +161,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-4 h-4 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-4 h-4 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -116,7 +176,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-5 h-5 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-5 h-5 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -129,8 +189,9 @@ function Id({ chat }: Props) {
                             </div>
                             <div className="flex items-center group">
                                 <div className="">
-                                    <p className="text-xs leading-[8px] text-slate-600">Last Name</p>
+                                    <p className="text-xs leading-[8px] text-muted dark:text-dark-muted">Last Name</p>
                                     <input
+                                        maxLength={32}
                                         ref={lastNameRef}
                                         onChange={(e) => setLastName(e.target.value)}
                                         readOnly={edit !== 'lastName'}
@@ -145,7 +206,7 @@ function Id({ chat }: Props) {
                                         setEdit(edit === 'lastName' ? null : 'lastName')
                                         lastNameRef.current?.focus()
                                     }}
-                                    className="transition-all w-8 h-8 center hover:bg-[#80808020] rounded-full active:scale-95"
+                                    className="transition-all w-8 h-8 center hover:bg-hover-primary rounded-full active:scale-95"
                                 >
                                     {edit !== 'lastName' ? (
                                         <svg
@@ -154,7 +215,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-4 h-4 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-4 h-4 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -169,7 +230,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-5 h-5 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-5 h-5 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -183,8 +244,9 @@ function Id({ chat }: Props) {
                             <hr className="mr-1 " />
                             <div className="flex items-center group">
                                 <div className="">
-                                    <p className="text-xs leading-[8px] text-slate-600">Username</p>
+                                    <p className="text-xs leading-[8px] text-muted dark:text-dark-muted">Username</p>
                                     <input
+                                        maxLength={32}
                                         ref={usernameRef}
                                         onChange={(e) => {
                                             setUsername(e.target.value)
@@ -195,19 +257,30 @@ function Id({ chat }: Props) {
                                         value={username}
                                     ></input>
                                     <p
-                                        className={`text-xs ${
+                                        className={`transition-all text-xs ${
                                             isFetching
                                                 ? 'text-slate-600'
-                                                : usernameIsValid
+                                                : usernameIsAvailable && username !== ''
                                                   ? 'text-green-500'
                                                   : 'text-red-500'
                                         }`}
                                     >
-                                        {isFetching
-                                            ? 'Loading...'
+                                        {username === ''
+                                            ? 'This field is required'
+                                            : isFetching
+                                              ? 'Loading...'
+                                              : usernameIsAvailable
+                                                ? 'This username is available'
+                                                : 'This username is not available'}
+                                    </p>
+                                    <p
+                                        className={`transition-all text-xs ${username !== '' && usernameIsValid ? 'text-green-500' : 'text-red-500'}`}
+                                    >
+                                        {username === ''
+                                            ? 'Username cannot be empty'
                                             : usernameIsValid
-                                              ? 'This username is available'
-                                              : 'This username is not available'}
+                                              ? 'Username is valid'
+                                              : 'Username cannot contain special characters'}
                                     </p>
                                 </div>
                                 <button
@@ -216,7 +289,7 @@ function Id({ chat }: Props) {
                                         setEdit(edit === 'username' ? null : 'username')
                                         usernameRef.current?.focus()
                                     }}
-                                    className="transition-all w-8 h-8 center hover:bg-[#80808020] rounded-full active:scale-95"
+                                    className="transition-all w-8 h-8 center hover:bg-hover-primary rounded-full active:scale-95"
                                 >
                                     {edit !== 'username' ? (
                                         <svg
@@ -225,7 +298,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-4 h-4 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-4 h-4 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -240,7 +313,7 @@ function Id({ chat }: Props) {
                                             viewBox="0 0 24 24"
                                             strokeWidth={1.5}
                                             stroke="currentColor"
-                                            className="w-5 h-5 stroke-slate-600 opacity-0 group-hover:opacity-100 transition-all"
+                                            className="w-5 h-5 stroke-muted dark:stroke-dark-muted transition-all"
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -253,19 +326,20 @@ function Id({ chat }: Props) {
                             </div>
                         </section>
                     </div>
-                    <div className="w-min p-2">
+                    <div className="w-min p-4">
                         <button
                             disabled={isFetching || !usernameIsValid}
                             onClick={() => {
                                 if (
                                     username === profile!.username &&
                                     firstName === profile!.first_name &&
-                                    username === profile!.username
-                                )
+                                    lastName === profile!.last_name
+                                ) {
                                     return addToast({
                                         text: 'Successfully updated profile',
                                         type: 'success',
                                     })
+                                }
                                 updateProfile(
                                     {
                                         username: username,
@@ -282,7 +356,7 @@ function Id({ chat }: Props) {
                                     },
                                 )
                             }}
-                            className="transition-all bg-blue-300 w-16 py-1 rounded-lg [&:hover:not(:disabled)]:bg-blue-300/80 [&:active:not(:disabled)]:text-slate-600 [&:active:not(:disabled)]:scale-95"
+                            className="transition-all bg-button-secondary dark:bg-dark-button-secondary w-16 py-1 rounded-lg [&:hover:not(:disabled)]:bg-button-secondary/80 [&:hover:not(:disabled)]:dark:bg-dark-button-secondary/80 [&:active:not(:disabled)]:text-muted [&:active:not(:disabled)]:dark:text-dark-muted [&:active:not(:disabled)]:scale-95"
                         >
                             Save
                         </button>
@@ -291,13 +365,15 @@ function Id({ chat }: Props) {
             </div>
         )
     }
+    const submitRef = useRef<HTMLButtonElement>(null)
+
     const presence = usePresence()
     const channel = presence?.channel
 
     const messageListRef = useRef<VirtuosoHandle>(null)
     const receivedMenu = useRef<HTMLDivElement>(null)
     const sentMenu = useRef<HTMLDivElement>(null)
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLTextAreaElement>(null)
 
     const [activeMenu, setActiveMenu] = useState<React.RefObject<HTMLDivElement> | null>(null)
     const [activeMessageId, setActiveMessageId] = useState<number | null>(null)
@@ -305,13 +381,13 @@ function Id({ chat }: Props) {
     const [editMessageId, setEditMessageId] = useState<number | null>(null)
     const [replyMessageId, setReplyMessageId] = useState<number | null>(null)
 
-    const { data: _messages } = useMessages(chat.id || '')
+    const { data: _messages, isLoading } = useMessages(chat.id || '')
 
-    const messages: BaseMessage[] = useMemo<BaseMessage[]>(
+    const messages: ChatMessage[] = useMemo<ChatMessage[]>(
         () => (_messages || []).sort(({ created_at: a }, { created_at: b }) => (new Date(a) > new Date(b) ? 1 : -1)),
         [_messages],
     )
-    const [pendingMessages, setPendingMessages] = useState<BaseMessage[]>([])
+    const [pendingMessages, setPendingMessages] = useState<ChatMessage[]>([])
     const [currentMessage, setCurrentMessage] = useState('')
 
     const typing = useRef(false)
@@ -412,6 +488,11 @@ function Id({ chat }: Props) {
         baseContextMenuItemOnClick(e)
         deleteMessage({ message_id: activeMessageId, chat_id: chat.id })
     }
+
+    useEffect(() => {
+        inputRef.current!.style.height = '1px'
+        inputRef.current!.style.height = `${inputRef.current!.scrollHeight}px`
+    }, [currentMessage])
 
     return (
         <>
@@ -534,13 +615,17 @@ function Id({ chat }: Props) {
                 computeItemKey={(index) => messages[index]?.id || -index}
                 initialTopMostItemIndex={{ index: messages.length + pendingMessages.length - 1, align: 'end' }}
                 ref={messageListRef}
-                className="transition-all h-full scrollbar-thin scrollbar-thumb-sky-300 [&:not(:hover)]:scrollbar-thumb-transparent"
+                className="transition-all h-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-sky-200 dark:scrollbar-thumb-slate-500 [&:not(:hover)]:scrollbar-thumb-transparent"
                 totalCount={messages.length + pendingMessages.length}
                 components={{
                     Header: () => <div className="h-16"></div>,
-                    Footer: () => <div className={'h-[76px]'}></div>,
+                    Footer: () => (
+                        <div
+                            className={`transition-all ${replyMessageId !== null || editMessageId !== null ? 'h-[124px]' : 'h-[76px]'}`}
+                        ></div>
+                    ),
                     EmptyPlaceholder: () =>
-                        chat.id ? (
+                        isLoading ? (
                             <div className="h-full flex center">
                                 <svg
                                     width={24}
@@ -610,6 +695,7 @@ function Id({ chat }: Props) {
             <form
                 className="backdrop-blur-sm flex flex-col absolute left-0 bottom-0 right-0 pb-2 px-2 "
                 onSubmit={(e) => {
+                    inputRef.current!.style.height = '24px'
                     e.preventDefault()
                     inputRef.current?.focus()
                     setCurrentMessage('')
@@ -625,8 +711,9 @@ function Id({ chat }: Props) {
                         return
                     }
                     setReplyMessageId(null)
-                    const newMessage: BaseMessage = {
-                        text: currentMessage,
+                    const currentText = currentMessage.trim()
+                    const newMessage: ChatMessage = {
+                        text: currentText,
                         sender_id: session.user.id,
                         reply_to_message_id: replyMessageId,
                         chat_id: chat.id || undefined,
@@ -661,13 +748,13 @@ function Id({ chat }: Props) {
                             [
                                 {
                                     chat_id: chat.id,
-                                    text: currentMessage,
+                                    text: currentText,
                                     receiver_id: chat.user.id,
                                     reply_to_message_id: replyMessageId,
                                 },
                             ],
                             {
-                                onSuccess: () => {
+                                onSettled: () => {
                                     // TODO: Handle Error
                                     setPendingMessages((_pendingMessages) =>
                                         _pendingMessages.filter((message) => message !== newMessage),
@@ -679,7 +766,7 @@ function Id({ chat }: Props) {
                 }}
             >
                 <div
-                    className={`${replyMessageId !== null || editMessageId !== null ? 'h-12 opacity-100' : 'h-0 translate-y-full opacity-0'} py-1 duration-300 transition-all bg-blue-50/90 backdrop-blur-sm rounded-t-lg flex items-center shadow-sm`}
+                    className={`${replyMessageId !== null || editMessageId !== null ? 'h-12 opacity-100' : 'h-0 translate-y-full opacity-0'} py-1 duration-300 transition-all bg-primary/90 dark:bg-dark-primary/90 backdrop-blur-sm rounded-t-lg flex items-center shadow-sm`}
                 >
                     <div className="basis-10 grow-0 shrink-0  mx-1 flex center">
                         {replyMessageId !== null && (
@@ -689,7 +776,7 @@ function Id({ chat }: Props) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={2}
                                 stroke="currentColor"
-                                className="basis-5 grow-0 shrink-0 w-5 h-5 stroke-slate-600"
+                                className="basis-5 grow-0 shrink-0 w-5 h-5 stroke-muted dark:stroke-dark-muted"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -705,7 +792,7 @@ function Id({ chat }: Props) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-5 h-5 stroke-slate-600"
+                                className="w-5 h-5 stroke-muted dark:stroke-dark-muted"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -716,7 +803,7 @@ function Id({ chat }: Props) {
                         )}
                     </div>
                     <button
-                        className="px-3 rounded-lg bg-blue-100 h-full flex items-center basis-full overflow-hidden"
+                        className="px-3 rounded-lg bg-reply-message dark:bg-dark-reply-message h-full flex items-center basis-full overflow-hidden"
                         onClick={(e) => {
                             e.stopPropagation()
                             const id = replyMessageId || editMessageId
@@ -724,7 +811,7 @@ function Id({ chat }: Props) {
                         }}
                         type="button"
                     >
-                        <p className="text-slate-600 truncate">
+                        <p className="text-muted dark:text-dark-muted truncate">
                             {
                                 messages?.find(
                                     (message) => message.id === editMessageId || message.id === replyMessageId,
@@ -733,7 +820,7 @@ function Id({ chat }: Props) {
                         </p>
                     </button>
                     <button
-                        className="basis-12 mx-1 grow-0 shrink-0 rounded-lg hover:bg-[#80808020] h-full flex center"
+                        className="basis-12 mx-1 grow-0 shrink-0 rounded-lg hover:bg-hover-primary h-full flex center"
                         onClick={() => {
                             if (editMessageId) setCurrentMessage('')
                             setEditMessageId(null)
@@ -747,30 +834,39 @@ function Id({ chat }: Props) {
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                             stroke="currentColor"
-                            className="w-6 h-6 stroke-slate-400"
+                            className="w-6 h-6 stroke-muted dark:stroke-dark-muted"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
                 <div
-                    className={`transition-all flex w-full gap-2 bg-blue-50 ${replyMessageId !== null || editMessageId !== null ? 'rounded-b-lg' : 'rounded-lg'}`}
+                    className={`transition-all flex w-full gap-2 bg-primary dark:bg-dark-primary ${replyMessageId !== null || editMessageId !== null ? 'rounded-b-lg' : 'rounded-lg'}`}
                 >
-                    <section className={`transition-all basis-full py-2 px-6 h-14`}>
-                        <input
+                    <section className={`transition-all basis-full py-2 px-6 min-h-14 flex items-center`}>
+                        <textarea
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    submitRef.current?.click()
+                                    e.preventDefault()
+                                }
+                            }}
                             ref={inputRef}
                             value={currentMessage}
                             autoComplete="off"
+                            wrap="soft"
                             id="messageTextInput"
-                            type="text"
-                            className="w-full h-full bg-transparent outline-none"
+                            className="w-full h-6 bg-transparent outline-none resize-none"
                             placeholder="Message"
-                            onChange={(e) => setCurrentMessage(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentMessage(e.target.value)
+                            }}
                         />
                     </section>
-                    <div className=" basis-14 grow-0 shrink-0 p-1 shadow-sm">
+                    <div className=" basis-14 grow-0 shrink-0 p-1 shadow-sm center">
                         <button
-                            className={`transition-all duration-200 w-full h-full flex center rounded-lg ${currentMessage === '' ? '' : 'hover:bg-[#80808020]'} `}
+                            ref={submitRef}
+                            className={`transition-all w-12 h-12 flex center rounded-lg ${currentMessage === '' ? '' : 'hover:bg-hover-primary'} `}
                             disabled={currentMessage === ''}
                             type="submit"
                         >
@@ -778,7 +874,7 @@ function Id({ chat }: Props) {
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                                 fill="currentColor"
-                                className={`h-6 w-6 ${currentMessage === '' ? 'fill-slate-400' : 'fill-blue-500'} transition-all duration-200 ease-in-out`}
+                                className={`h-6 w-6 ${currentMessage === '' ? 'fill-slate-400' : 'fill-blue-500'} transition-all ease-in-out`}
                             >
                                 <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
                             </svg>

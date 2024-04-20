@@ -7,7 +7,7 @@ type Props = {
 function BackButton({ onClick }: Props) {
     return (
         <button
-            className={` transition-all h-12 w-12 flex justify-center items-center rounded-full hover:bg-[#80808020] active:scale-95`}
+            className={` transition-all h-12 w-12 flex justify-center items-center rounded-full hover:bg-hover-primary active:scale-95`}
             onClick={onClick}
         >
             <svg
@@ -16,7 +16,7 @@ function BackButton({ onClick }: Props) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6 stroke-slate-600"
+                className="w-6 h-6 stroke-muted dark:stroke-dark-muted"
             >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>

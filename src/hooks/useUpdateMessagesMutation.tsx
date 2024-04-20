@@ -12,7 +12,17 @@ export const useUpdateMessagesMutation = () => {
                     message.id === message_id ? { ...message, text: text } : message,
                 ),
             )
-            return (await supabase.from('messages').update({ text: text }).eq('id', message_id).select().single()).data
+            const { data, error } = await supabase
+                .from('messages')
+                .update({ text: text })
+                .eq('id', message_id)
+                .select()
+                .single()
+            if (error) throw error
+            return data
+        },
+        onError: (_, { chat_id }) => {
+            return queryClient.invalidateQueries({ queryKey: ['messages', chat_id] })
         },
     })
 }

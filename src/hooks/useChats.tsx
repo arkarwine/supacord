@@ -6,14 +6,18 @@ export const useChats = () =>
     useQuery({
         queryKey: ['chats'] as const,
         queryFn: async (): Promise<Chat[]> => {
-            const res =
-                (await supabase.from('get_chats').select()).data?.map(
+            const { data, error } = await supabase.from('get_chats').select()
+            if (error) throw error
+
+            return (
+                data?.map(
                     (chat): Chat => ({
                         id: chat.id,
-                        user: chat.user || undefined,
+                        user: chat.user,
                         state: 'present',
+                        last_message: chat.last_message,
                     }),
                 ) || []
-            return res
+            )
         },
     })

@@ -1,13 +1,16 @@
-import { useCallback, useState } from 'react'
+import { AdvancedImage } from '@cloudinary/react'
+import { fill } from '@cloudinary/url-gen/actions/resize'
+import { useCallback, useContext } from 'react'
+import { CloudinaryContext } from '../providers/cloudinary'
 type Props = {
     online?: boolean
-    src: string
+    id: string | null
     fallback?: string
     fullname: string
     className?: string
 }
 
-function Avatar({ fallback, src, className = '', fullname, online = false }: Props) {
+function Avatar({ fallback, id, className, fullname, online }: Props) {
     const strToHslColor = useCallback((str: string) => {
         let hash = 0
         for (let i = 0; i < str.length; i++) {
@@ -15,25 +18,53 @@ function Avatar({ fallback, src, className = '', fullname, online = false }: Pro
         }
 
         let h = hash % 360
-        return 'hsl(' + h + ', ' + 44 + '%, ' + 55 + '%)'
-    }, [])
-    const [error, setError] = useState(false)
 
+        return (
+            'linear-gradient(to top right, hsl(' +
+            h +
+            ', ' +
+            44 +
+            '%, ' +
+            55 +
+            '%), hsl(' +
+            h +
+            ', ' +
+            66 +
+            '%, ' +
+            77 +
+            '%))'
+        )
+    }, [])
+    const cld = useContext(CloudinaryContext)!
+
+    const getAvatar = useCallback(
+        (id: string) => {
+            const avatar = cld.image(id)
+            return avatar.resize(fill().width(250).height(250))
+        },
+        [id],
+    )
     return (
         <section
-            className={` relative flex justify-center items-center rounded-full shadow-sm ` + className}
+            className={` relative center rounded-full shadow-sm ` + className}
             style={{
                 height: 48,
                 width: 48,
-                backgroundColor: strToHslColor(fullname),
+                background: strToHslColor(fullname),
             }}
         >
-            {error ? (
-                <p className="text-lg font-bold line-clamp-1 text-slate-800">{fallback}</p>
+            {id === null ? (
+                <p className="text-lg font-bold line-clamp-1 text-black dark:text-white">{fallback}</p>
             ) : (
-                <img key={src} src={src} onError={() => setError(true)} referrerPolicy="no-referrer" />
+                <div className="rounded-full overflow-hidden">
+                    <AdvancedImage key={id} cldImg={getAvatar(id)} />
+                </div>
             )}
-            {online && <div className="bg-green-400 h-3 w-3 absolute rounded-full right-0 bottom-0"></div>}
+            {online && (
+                <div className="absolute rounded-full right-0 bottom-0 p-0.5 bg-primary dark:bg-dark-primary">
+                    <div className="bg-green-400 h-2.5 w-2.5 rounded-full"></div>
+                </div>
+            )}
         </section>
     )
 }

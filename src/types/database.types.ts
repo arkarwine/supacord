@@ -13,16 +13,27 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          last_message_id: number | null
         }
         Insert: {
           created_at?: string
           id?: string
+          last_message_id?: number | null
         }
         Update: {
           created_at?: string
           id?: string
+          last_message_id?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_chats_last_message_id_fkey"
+            columns: ["last_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       members: {
         Row: {
@@ -49,6 +60,13 @@ export type Database = {
             columns: ["chat_id"]
             isOneToOne: false
             referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_members_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "get_chats"
             referencedColumns: ["id"]
           },
           {
@@ -110,6 +128,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "public_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "get_chats"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_messages_receiver_id_fkey"
             columns: ["receiver_id"]
             isOneToOne: false
@@ -134,6 +159,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar: string | null
           created_at: string
           first_name: string
           id: string
@@ -141,6 +167,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          avatar?: string | null
           created_at?: string
           first_name: string
           id?: string
@@ -148,6 +175,7 @@ export type Database = {
           username: string
         }
         Update: {
+          avatar?: string | null
           created_at?: string
           first_name?: string
           id?: string
@@ -169,17 +197,10 @@ export type Database = {
       get_chats: {
         Row: {
           id: string | null
+          last_message: Database["public"]["Tables"]["messages"]["Row"] | null
           user: Database["public"]["Tables"]["profiles"]["Row"] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_members_chat_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "chats"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
@@ -190,33 +211,15 @@ export type Database = {
         Returns: {
           created_at: string
           id: string
+          last_message_id: number | null
         }
       }
-      delete_message:
-        | {
-            Args: {
-              message_id: number
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              message_id: number
-              chat_id: string
-            }
-            Returns: boolean
-          }
-      get_chat: {
+      delete_message: {
         Args: {
-          search_id: string
+          message_id: number
+          chat_id: string
         }
-        Returns: {
-          id: string
-          user_id: string
-          first_name: string
-          last_name: string
-          username: string
-        }[]
+        Returns: boolean
       }
       get_messages: {
         Args: {
@@ -233,35 +236,6 @@ export type Database = {
           start: boolean | null
           text: string
         }[]
-      }
-      search: {
-        Args: {
-          search_text: string
-        }
-        Returns: {
-          id: string
-          user_id: string
-          first_name: string
-          last_name: string
-          username: string
-        }[]
-      }
-      send_initial_message: {
-        Args: {
-          text: string
-          receiver_user_id: string
-        }
-        Returns: {
-          chat_id: string
-          created_at: string
-          deleted: boolean
-          id: number
-          receiver_id: string | null
-          reply_to_message_id: number | null
-          sender_id: string
-          start: boolean | null
-          text: string
-        }
       }
     }
     Enums: {

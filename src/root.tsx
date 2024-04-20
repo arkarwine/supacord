@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import useSession from './hooks/useSession'
-import ToastProvider from './providers/toast'
+import CloudinaryProvider from './providers/cloudinary'
 
 type Props = {}
 
@@ -10,15 +10,15 @@ function Root({}: Props) {
 
     if (isLoading) {
         return (
-            <div className="flex center h-full">
+            <div className="flex center h-full bg-primary dark:bg-dark-primary">
                 <div className="w-5 h-5 rounded-full bg-sky-300 animate-ping"></div>
             </div>
         )
     }
     return (
-        <ToastProvider>
+        <CloudinaryProvider>
             <Outlet />
-        </ToastProvider>
+        </CloudinaryProvider>
     )
 }
 

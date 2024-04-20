@@ -8,15 +8,20 @@ export const useChatsMutation = () => {
     return useMutation({
         mutationFn: async (receiver_user: Profile): Promise<Chat> => {
             // TODO: Error
-            const res = (await supabase.rpc('create_private_chat', { receiver_user_id: receiver_user.id })).data
+            const { data, error } = await supabase.rpc('create_private_chat', { receiver_user_id: receiver_user.id })
+            if (error) throw error
             return {
-                id: res?.id!,
+                id: data?.id!,
                 user: receiver_user,
                 state: 'present',
+                last_message: null,
             }
         },
         onSuccess: (chat: Chat) => {
             queryClient.setQueryData<Chat[]>(['chats'], (oldChats) => [...(oldChats || []), chat])
+        },
+        onError: () => {
+            return queryClient.invalidateQueries({ queryKey: ['chats'] })
         },
     })
 }
