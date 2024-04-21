@@ -15,3 +15,5 @@ Features:
 -   Optional Profiles: Personalize your Supacord experience with a _cool_ avatar (if you want).
 
 -   Boost Productivity: Save time and stay focused by having all your chats readily accessible.
+
+![a](https://)
