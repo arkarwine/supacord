@@ -16,6 +16,12 @@ Features:
 
 -   Boost Productivity: Save time and stay focused by having all your chats readily accessible.
 
+## Demo Video
+
+https://github.com/arkarwine/supacord/raw/main/examples/aaa.mp4?raw=true
+
+## Demo images
+
 ![1](https://github.com/arkarwine/supacord/blob/main/examples/1.png?raw=true)
 ![2](https://github.com/arkarwine/supacord/blob/main/examples/2.png?raw=true)
 ![3](https://github.com/arkarwine/supacord/blob/main/examples/3.png?raw=true)
