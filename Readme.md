@@ -22,9 +22,9 @@ https://github.com/arkarwine/supacord/blob/main/examples/aaa.mp4
 
 ## Demo images
 
-![1](https://github.com/arkarwine/supacord/blob/main/examples/1.png?raw=true)
-![2](https://github.com/arkarwine/supacord/blob/main/examples/2.png?raw=true)
-![3](https://github.com/arkarwine/supacord/blob/main/examples/3.png?raw=true)
-![4](https://github.com/arkarwine/supacord/blob/main/examples/4.png?raw=true)
-![5](https://github.com/arkarwine/supacord/blob/main/examples/5.png?raw=true)
-![6](https://github.com/arkarwine/supacord/blob/main/examples/6.png?raw=true)
+![1](https://github.com/arkarwine/supacord/blob/main/demos/1.png?raw=true)
+![2](https://github.com/arkarwine/supacord/blob/main/demos/2.png?raw=true)
+![3](https://github.com/arkarwine/supacord/blob/main/demos/3.png?raw=true)
+![4](https://github.com/arkarwine/supacord/blob/main/demos/4.png?raw=true)
+![5](https://github.com/arkarwine/supacord/blob/main/demos/5.png?raw=true)
+![6](https://github.com/arkarwine/supacord/blob/main/demos/6.png?raw=true)
