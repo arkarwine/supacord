@@ -18,7 +18,9 @@ Features:
 
 ## Demo Video
 
-https://raw.githubusercontent.com/arkarwine/supacord/main/demos/demo.mp4
+https://github.com/arkarwine/supacord/assets/112911561/233ed2ef-eed9-404a-9fb8-e7c522e13729
+
+arwine/supacord/main/demos/demo.mp4
 
 ## Demo images
 
