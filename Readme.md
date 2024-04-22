@@ -18,9 +18,7 @@ Features:
 
 ## Demo Video
 
-https://github.com/arkarwine/supacord/raw/main/examples/aaa.mp4
-
-https://drive.google.com/uc?export=download&id=1FUC5LXPneHuBvrT8pEkp2EILTz7vQQIZ
+https://github.com/arkarwine/supacord/blob/main/examples/aaa.mp4
 
 ## Demo images
 
