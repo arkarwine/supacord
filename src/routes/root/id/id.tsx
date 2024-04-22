@@ -47,6 +47,41 @@ function Id({ chat }: Props) {
                     <div className="p-1 w-14">
                         <BackButton onClick={() => navigate('/chat')} />
                     </div>
+                    <div className="w-min p-4">
+                        <button
+                            disabled={isFetching || !usernameIsValid}
+                            onClick={() => {
+                                if (
+                                    username === profile!.username &&
+                                    firstName === profile!.first_name &&
+                                    lastName === profile!.last_name
+                                ) {
+                                    return addToast({
+                                        text: 'Successfully updated profile',
+                                        type: 'success',
+                                    })
+                                }
+                                updateProfile(
+                                    {
+                                        username: username,
+                                        first_name: firstName,
+                                        last_name: lastName,
+                                    },
+                                    {
+                                        onSuccess: () => {
+                                            addToast({
+                                                text: 'Successfully updated profile',
+                                                type: 'success',
+                                            })
+                                        },
+                                    },
+                                )
+                            }}
+                            className="transition-all bg-button-secondary dark:bg-dark-button-secondary w-16 py-1 rounded-lg [&:hover:not(:disabled)]:bg-button-secondary/80 [&:hover:not(:disabled)]:dark:bg-dark-button-secondary/80 [&:active:not(:disabled)]:text-muted [&:active:not(:disabled)]:dark:text-dark-muted [&:active:not(:disabled)]:scale-95"
+                        >
+                            Save
+                        </button>
+                    </div>
                     <div className=" h-min flex items-center w-full pb-4">
                         <div className="group relative basis-24 grow-0 shrink-0 peer rounded-full h-24 center overflow-hidden">
                             <Avatar
@@ -325,41 +360,6 @@ function Id({ chat }: Props) {
                                 </button>
                             </div>
                         </section>
-                    </div>
-                    <div className="w-min p-4">
-                        <button
-                            disabled={isFetching || !usernameIsValid}
-                            onClick={() => {
-                                if (
-                                    username === profile!.username &&
-                                    firstName === profile!.first_name &&
-                                    lastName === profile!.last_name
-                                ) {
-                                    return addToast({
-                                        text: 'Successfully updated profile',
-                                        type: 'success',
-                                    })
-                                }
-                                updateProfile(
-                                    {
-                                        username: username,
-                                        first_name: firstName,
-                                        last_name: lastName,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            addToast({
-                                                text: 'Successfully updated profile',
-                                                type: 'success',
-                                            })
-                                        },
-                                    },
-                                )
-                            }}
-                            className="transition-all bg-button-secondary dark:bg-dark-button-secondary w-16 py-1 rounded-lg [&:hover:not(:disabled)]:bg-button-secondary/80 [&:hover:not(:disabled)]:dark:bg-dark-button-secondary/80 [&:active:not(:disabled)]:text-muted [&:active:not(:disabled)]:dark:text-dark-muted [&:active:not(:disabled)]:scale-95"
-                        >
-                            Save
-                        </button>
                     </div>
                 </section>
             </div>
